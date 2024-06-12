@@ -23,6 +23,8 @@ export const ErrorResponseMessages = {
 
   // App specific
   EXPENSE_EXISTS: "Expense does not exists",
-  INCOME_EXISTS: "Income does not exists"
+  INCOME_EXISTS: "Income does not exists",
+  CATEGORY_EXISTS: "Category does not exists",
+  SOURCE_EXISTS: "Source does not exists"
 
 };
