@@ -22,6 +22,7 @@ export const ErrorResponseMessages = {
   ACCOUNT_NOT_APPROVED: "Please approve your account first",
 
   // App specific
-  EXPENSE_EXISTS: "Expense does not exists"
+  EXPENSE_EXISTS: "Expense does not exists",
+  INCOME_EXISTS: "Income does not exists"
 
 };

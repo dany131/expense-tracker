@@ -65,3 +65,14 @@ export enum ExpenseCategory {
   TRAVEL = "Travel",
   OTHER = "Other",
 }
+
+export enum IncomeCategory {
+  SALARY = "Salary",
+  FREELANCE = "Freelance",
+  INVESTMENTS = "Investments",
+  BUSINESS = "Business",
+  RENTAL = "Rental",
+  PENSION = "Pension",
+  GIFTS = "Gifts",
+  OTHER = "Other",
+}

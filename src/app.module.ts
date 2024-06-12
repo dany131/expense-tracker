@@ -12,6 +12,7 @@ import { AdminModule } from "@routes/admin/admin.module";
 import { AuthModule } from "@routes/auth/auth.module";
 import { UserModule } from "@routes/user/user.module";
 import { ExpenseModule } from "@routes/expense/expense.module";
+import { IncomeModule } from "@routes/income/income.module";
 
 
 @Module({
@@ -30,7 +31,7 @@ import { ExpenseModule } from "@routes/expense/expense.module";
     // Request rate limiting - 50 requests per IP in 1 minute (60 seconds)
     ThrottlerModule.forRoot({ throttlers: [{ name: "Request-Limit", ttl: 60 * 1000, limit: 50 }] }),
     // Routes
-    AuthModule, AdminModule, UserModule, ExpenseModule
+    AuthModule, AdminModule, UserModule, ExpenseModule, IncomeModule
   ],
   controllers: [AppController],
   providers: [
