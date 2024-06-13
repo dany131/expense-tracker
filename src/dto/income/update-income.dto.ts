@@ -1,6 +1,5 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, Length, Max, Min } from "class-validator";
+import { IsBoolean, IsMongoId, IsNotEmpty, IsNumber, IsOptional, Length, Max, Min } from "class-validator";
 import { Trim } from "@decorators/trim.decorator";
-import { IncomeCategory } from "@types";
 import { Transform, Type } from "class-transformer";
 import { IsValidDate } from "@decorators/valid-date.decorator";
 
@@ -16,11 +15,11 @@ export class UpdateIncomeDto {
   @Max(9999999)
   amount: number;
 
-  /** Category of income
-   * @enum IncomeCategory*/
+  /** Source of income
+   * @example 6669e1e844bb78471c155c6a*/
   @IsOptional()
-  @IsEnum(IncomeCategory)
-  category: IncomeCategory;
+  @IsMongoId()
+  source: string;
 
   /** Date of income, DD/MM/YYYY
    * @example 23/12/2023*/

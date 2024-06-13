@@ -7,7 +7,7 @@ import { Request } from "express";
 import { ApiMessage, ApiMessageData, ApiMessageDataPagination, Role } from "@types";
 import { Roles } from "@decorators/roles.decorator";
 import { SourceService } from "@routes/source/source.service";
-import { CreateSourceDto, UpdateSourceDto } from "@dto/source";
+import { CreateSourceDto, GetAllSourcesDto, UpdateSourceDto } from "@dto/source";
 
 
 @ApiTags("source")
@@ -50,7 +50,19 @@ export class SourceController {
   @Delete("/")
   @HttpCode(HttpStatus.OK)
   @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
-  async deleteSource(@Query("sourceId", ValidateMongoId) sourceId: string): Promise<ApiMessage> {
-    return await this.sourceService.deleteSource(sourceId);
+  async deleteSource(@Req() request: Request,
+                     @Query("sourceId", ValidateMongoId) sourceId: string): Promise<ApiMessage> {
+    return await this.sourceService.deleteSource(request.user.id, sourceId);
   }
+
+  /** Get all sources*/
+  @Get("all")
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  async getSources(@Req() request: Request,
+                   @Query() paginationQuery: PaginationParamsDto,
+                   @Query() filtrationQuery: GetAllSourcesDto): Promise<ApiMessageDataPagination> {
+    return await this.sourceService.getSources(request.user.id, paginationQuery, filtrationQuery);
+  }
+
 }

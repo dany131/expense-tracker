@@ -1,8 +1,9 @@
 import * as mongoose from "mongoose";
 import { Role, TimeStamps } from "@types";
+import { excludeDeletedPlugin } from "@plugins/exclude-deleted.plugin";
 
 
-export const UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   name: String,
   email: String,
   password: String,
@@ -15,6 +16,7 @@ export const UserSchema = new mongoose.Schema({
 }, { versionKey: false, timestamps: true });
 
 export interface UserModel extends mongoose.Document, TimeStamps {
+  _id: mongoose.Schema.Types.ObjectId;
   name: string;
   email: string;
   password: string;
@@ -25,3 +27,7 @@ export interface UserModel extends mongoose.Document, TimeStamps {
   verificationCode: string;
   isDeleted: boolean;
 }
+
+UserSchema.plugin(excludeDeletedPlugin);
+
+export { UserSchema };

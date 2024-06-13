@@ -1,26 +1,38 @@
 import * as mongoose from "mongoose";
-import { IncomeCategory, TimeStamps } from "@types";
+import { TimeStamps } from "@types";
+import { excludeDeletedPlugin } from "@plugins/exclude-deleted.plugin";
 
 
-export const IncomeSchema = new mongoose.Schema({
+const IncomeSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: "User"
   },
   amount: Number,
-  category: { type: String, enum: IncomeCategory },
+  source: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "Source"
+  },
   date: String,
   description: String,
-  isRecurring: Boolean
+  isRecurring: Boolean,
+  isDeleted: Boolean
 
 }, { versionKey: false, timestamps: true });
 
 export interface IncomeModel extends mongoose.Document, TimeStamps {
+  _id: mongoose.Schema.Types.ObjectId;
   user: mongoose.Schema.Types.ObjectId;
   amount: number;
-  category: IncomeCategory;
+  source: mongoose.Schema.Types.ObjectId;
   date: string;
   description: string;
   isRecurring: boolean;
+  isDeleted: boolean;
 }
+
+IncomeSchema.plugin(excludeDeletedPlugin);
+
+export { IncomeSchema };

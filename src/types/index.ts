@@ -76,3 +76,10 @@ export enum IncomeCategory {
   GIFTS = "Gifts",
   OTHER = "Other",
 }
+
+export enum TimeFrame {
+  Month = "Month",
+  Year = "Year",
+  Week = "Week",
+  Today = "Today"
+}

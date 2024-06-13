@@ -7,7 +7,7 @@ import { Request } from "express";
 import { ApiMessage, ApiMessageData, ApiMessageDataPagination, Role } from "@types";
 import { Roles } from "@decorators/roles.decorator";
 import { CategoriesService } from "@routes/categories/categories.service";
-import { CreateCategoryDto, UpdateCategoryDto } from "@dto/categories";
+import { CreateCategoryDto, GetCategoriesDto, UpdateCategoryDto } from "@dto/categories";
 
 
 @ApiTags("categories")
@@ -51,7 +51,19 @@ export class CategoriesController {
   @Delete("/")
   @HttpCode(HttpStatus.OK)
   @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
-  async deleteCategory(@Query("categoryId", ValidateMongoId) categoryId: string): Promise<ApiMessage> {
-    return await this.categoriesService.deleteCategory(categoryId);
+  async deleteCategory(@Req() request: Request,
+                       @Query("categoryId", ValidateMongoId) categoryId: string): Promise<ApiMessage> {
+    return await this.categoriesService.deleteCategory(request.user.id, categoryId);
   }
+
+  /** Get all categories*/
+  @Get("all")
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  async getCategories(@Req() request: Request,
+                      @Query() paginationQuery: PaginationParamsDto,
+                      @Query() filtrationQuery: GetCategoriesDto): Promise<ApiMessageDataPagination> {
+    return await this.categoriesService.getCategories(request.user.id, paginationQuery, filtrationQuery);
+  }
+
 }

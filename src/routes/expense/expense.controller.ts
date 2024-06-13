@@ -54,4 +54,13 @@ export class ExpenseController {
     return await this.expenseService.deleteExpense(expenseId);
   }
 
+  /** Get all expenses*/
+  @Get("all")
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  async getExpenses(@Req() request: Request,
+                    @Query() paginationQuery: PaginationParamsDto): Promise<ApiMessageDataPagination> {
+    return await this.expenseService.getExpenses(request.user.id, paginationQuery);
+  }
+
 }

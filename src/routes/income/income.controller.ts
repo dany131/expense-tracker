@@ -55,5 +55,13 @@ export class IncomeController {
     return await this.incomeService.deleteIncome(incomeId);
   }
 
+  @Get("all")
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  async getIncomes(@Req() request: Request,
+                   @Query() paginationQuery: PaginationParamsDto): Promise<ApiMessageDataPagination> {
+    return await this.incomeService.getIncomes(request.user.id, paginationQuery);
+  }
+
 }
 

@@ -2,18 +2,19 @@ import { CategoriesModel } from "@models/index";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { PaginationHelper } from "@helpers/index";
+import { AppHelper, PaginationHelper } from "@helpers/index";
 import { PaginationParamsDto } from "@dto/global";
 import { ErrorResponseMessages, SuccessResponseMessages } from "@messages/index";
 import { ApiMessage, ApiMessageData, ApiMessageDataPagination, FieldSelector } from "@types";
-import { CreateCategoryDto, UpdateCategoryDto } from "@dto/categories";
+import { CreateCategoryDto, GetCategoriesDto, UpdateCategoryDto } from "@dto/categories";
 
 
 @Injectable()
 export class CategoriesService {
 
   constructor(@InjectModel("Categories") private readonly Categories: Model<CategoriesModel>,
-              private paginationHelper: PaginationHelper) {
+              private paginationHelper: PaginationHelper,
+              private appHelper: AppHelper) {
   }
 
   /** Create categories*/
@@ -52,13 +53,33 @@ export class CategoriesService {
   }
 
   /** Delete category*/
-  async deleteCategory(categoryId: string): Promise<ApiMessage> {
-    await this.getCategory(categoryId);
-    await this.Categories.deleteOne({ _id: categoryId });
+  async deleteCategory(userId: string, categoryId: string): Promise<ApiMessage> {
+    const { user } = await this.getCategory(categoryId);
+    if (user.toString() !== userId) throw new BadRequestException(ErrorResponseMessages.INVALID_ACTION);
+
+    await this.Categories.updateOne({ _id: categoryId }, { isDeleted: true });
+
     return { message: SuccessResponseMessages.SUCCESS_GENERAL };
   }
 
   /** Get all categories*/
+  async getCategories(userId: string, pagination: PaginationParamsDto, getCategoriesDto: GetCategoriesDto): Promise<ApiMessageDataPagination> {
+    const { page, limit } = pagination;
+    const { searchQuery } = getCategoriesDto;
+
+    let matchingQuery: { user: string, name?: object } = { user: userId };
+
+    if (searchQuery) matchingQuery.name = { $regex: new RegExp(this.appHelper.escapeRegex(searchQuery), "gi") };
+
+    const { data, lastPage, total } = await this.paginationHelper.paginate({
+      model: this.Categories,
+      page,
+      limit,
+      matchingQuery
+    });
+
+    return { message: SuccessResponseMessages.SUCCESS_GENERAL, data, page, lastPage, total };
+  }
 
   /** Internal*/
   public async getCategory(categoryId: string): Promise<CategoriesModel> {

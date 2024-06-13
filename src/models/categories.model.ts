@@ -1,8 +1,9 @@
 import * as mongoose from "mongoose";
 import { ExpenseCategory, TimeStamps } from "@types";
+import { excludeDeletedPlugin } from "@plugins/exclude-deleted.plugin";
 
 
-export const CategoriesSchema = new mongoose.Schema({
+const CategoriesSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -10,13 +11,20 @@ export const CategoriesSchema = new mongoose.Schema({
   },
   name: String,
   categoryType: { type: String, enum: ExpenseCategory },
-  description: String
+  description: String,
+  isDeleted: Boolean
 
 }, { versionKey: false, timestamps: true });
 
 export interface CategoriesModel extends mongoose.Document, TimeStamps {
+  _id: mongoose.Schema.Types.ObjectId;
   user: mongoose.Schema.Types.ObjectId;
   name: string;
   categoryType: ExpenseCategory;
   description: string;
+  isDeleted: boolean;
 }
+
+CategoriesSchema.plugin(excludeDeletedPlugin);
+
+export { CategoriesSchema };

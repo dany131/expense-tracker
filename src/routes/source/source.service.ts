@@ -2,18 +2,19 @@ import { SourceModel } from "@models/index";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { PaginationHelper } from "@helpers/index";
+import { AppHelper, PaginationHelper } from "@helpers/index";
 import { PaginationParamsDto } from "@dto/global";
 import { ErrorResponseMessages, SuccessResponseMessages } from "@messages/index";
 import { ApiMessage, ApiMessageData, ApiMessageDataPagination, FieldSelector } from "@types";
-import { CreateSourceDto, UpdateSourceDto } from "@dto/source";
+import { CreateSourceDto, GetAllSourcesDto, UpdateSourceDto } from "@dto/source";
 
 
 @Injectable()
 export class SourceService {
 
   constructor(@InjectModel("Source") private readonly Source: Model<SourceModel>,
-              private paginationHelper: PaginationHelper) {
+              private paginationHelper: PaginationHelper,
+              private appHelper: AppHelper) {
   }
 
   /** Create source*/
@@ -52,13 +53,33 @@ export class SourceService {
   }
 
   /** Delete source*/
-  async deleteSource(sourceId: string): Promise<ApiMessage> {
-    await this.getSource(sourceId);
-    await this.Source.deleteOne({ _id: sourceId });
+  async deleteSource(userId: string, sourceId: string): Promise<ApiMessage> {
+    const { user } = await this.getSource(sourceId);
+    if (user.toString() !== userId) throw new BadRequestException(ErrorResponseMessages.INVALID_ACTION);
+
+    await this.Source.updateOne({ _id: sourceId }, { isDeleted: true });
+
     return { message: SuccessResponseMessages.SUCCESS_GENERAL };
   }
 
   /** Get all sources*/
+  async getSources(userId: string, pagination: PaginationParamsDto, getAllSourcesDto: GetAllSourcesDto): Promise<ApiMessageDataPagination> {
+    const { page, limit } = pagination;
+    const { searchQuery } = getAllSourcesDto;
+
+    let matchingQuery: { user: string, name?: object } = { user: userId };
+
+    if (searchQuery) matchingQuery.name = { $regex: new RegExp(this.appHelper.escapeRegex(searchQuery), "gi") };
+
+    const { data, lastPage, total } = await this.paginationHelper.paginate({
+      model: this.Source,
+      page,
+      limit,
+      matchingQuery
+    });
+
+    return { message: SuccessResponseMessages.SUCCESS_GENERAL, data, page, lastPage, total };
+  }
 
   /** Internal*/
   public async getSource(sourceId: string): Promise<SourceModel> {
