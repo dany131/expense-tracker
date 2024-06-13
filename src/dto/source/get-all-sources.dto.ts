@@ -1,13 +1,11 @@
 import { IsOptional, IsString, Length } from "class-validator";
 import { Trim } from "@decorators/trim.decorator";
+import { ApiProperty } from "@nestjs/swagger";
 
 
 export class GetAllSourcesDto {
 
-  /**
-   * Search by name of any source
-   * @example My source
-   */
+  @ApiProperty({ required: false, description: "Search by name of any source" })
   @IsOptional()
   @IsString()
   @Trim()

@@ -38,10 +38,9 @@ export class IncomeService {
   }
 
   /** Update income*/
-  async updateIncome(incomeId: string, userId: string, updateIncomeDto: UpdateIncomeDto): Promise<ApiMessageData> {
+  async updateIncome(incomeId: string, updateIncomeDto: UpdateIncomeDto): Promise<ApiMessageData> {
     const { amount, source, date, description, isRecurring } = updateIncomeDto;
     const income = await this.getIncome(incomeId);
-    if (income.user.toString() !== userId) throw new BadRequestException(ErrorResponseMessages.INVALID_ACTION);
 
     if (source) {
       const { _id } = await this.sourceService.getSource(source);

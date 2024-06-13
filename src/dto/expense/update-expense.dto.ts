@@ -21,8 +21,8 @@ export class UpdateExpenseDto {
   @IsMongoId()
   category: string;
 
-  /** Date of expense, DD/MM/YYYY
-   * @example 23/12/2023*/
+  /** Date of expense, YYYY-MM-DD
+   * @example 2023-12-23*/
   @IsOptional()
   @IsNotEmpty()
   @IsValidDate()

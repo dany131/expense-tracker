@@ -1,36 +1,37 @@
 import { Injectable } from "@nestjs/common";
 import * as moment from "moment";
 import { DateRange } from "@types";
+import { AppConstants } from "@constants/app.constants";
 
 
 @Injectable()
 export class DateHelper {
 
   getDate(date: string): Date {
-    return moment(date).utc().toDate();
+    return moment.utc(date, AppConstants.DATE_FORMAT).toDate();
   }
 
   getToday(): DateRange {
-    const start = moment().startOf("day").utc().toDate();
-    const end = moment().endOf("day").utc().toDate();
+    const start = moment().utc().startOf("day").toDate();
+    const end = moment().utc().endOf("day").toDate();
     return { start, end };
   }
 
   getThisWeek(): DateRange {
-    const start = moment().startOf("week").utc().toDate();
-    const end = moment().endOf("week").utc().toDate();
+    const start = moment().utc().startOf("week").toDate();
+    const end = moment().utc().endOf("week").toDate();
     return { start, end };
   }
 
   getThisMonth(): DateRange {
-    const start = moment().startOf("month").utc().toDate();
-    const end = moment().endOf("month").utc().toDate();
+    const start = moment().utc().startOf("month").toDate();
+    const end = moment().utc().endOf("month").toDate();
     return { start, end };
   }
 
   getThisYear(): DateRange {
-    const start = moment().startOf("year").utc().toDate();
-    const end = moment().endOf("year").utc().toDate();
+    const start = moment().utc().startOf("year").toDate();
+    const end = moment().utc().endOf("year").toDate();
     return { start, end };
   }
 

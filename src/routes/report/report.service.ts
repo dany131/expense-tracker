@@ -14,6 +14,7 @@ import {
 import { GetSummaryDto } from "@dto/report";
 import { PdfHelper } from "@helpers/pdf.helper";
 import { Response } from "express";
+import { take } from "rxjs";
 
 
 @Injectable()

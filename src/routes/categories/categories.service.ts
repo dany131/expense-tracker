@@ -25,7 +25,8 @@ export class CategoriesService {
       user: userId,
       name,
       categoryType,
-      description
+      description,
+      isDeleted: false
     });
 
     await categories.save();
@@ -33,10 +34,9 @@ export class CategoriesService {
   }
 
   /** Update category*/
-  async updateCategory(categoryId: string, userId: string, updateCategoryDto: UpdateCategoryDto): Promise<ApiMessageData> {
+  async updateCategory(categoryId: string, updateCategoryDto: UpdateCategoryDto): Promise<ApiMessageData> {
     const { name, description, categoryType } = updateCategoryDto;
     const category = await this.getCategory(categoryId);
-    if (category.user.toString() !== userId) throw new BadRequestException(ErrorResponseMessages.INVALID_ACTION);
 
     category.name = name || category.name;
     category.categoryType = categoryType || category.categoryType;
@@ -53,10 +53,8 @@ export class CategoriesService {
   }
 
   /** Delete category*/
-  async deleteCategory(userId: string, categoryId: string): Promise<ApiMessage> {
-    const { user } = await this.getCategory(categoryId);
-    if (user.toString() !== userId) throw new BadRequestException(ErrorResponseMessages.INVALID_ACTION);
-
+  async deleteCategory(categoryId: string): Promise<ApiMessage> {
+    await this.getCategory(categoryId);
     await this.Categories.updateOne({ _id: categoryId }, { isDeleted: true });
 
     return { message: SuccessResponseMessages.SUCCESS_GENERAL };

@@ -41,18 +41,16 @@ export class CategoriesController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiMessageDataDto })
   async updateCategory(@Query("categoryId", ValidateMongoId) categoryId: string,
-                       @Req() request: Request,
                        @Body() reqBody: UpdateCategoryDto): Promise<ApiMessageData> {
-    return await this.categoriesService.updateCategory(categoryId, request.user.id, reqBody);
+    return await this.categoriesService.updateCategory(categoryId, reqBody);
   }
 
   /** Delete category*/
   @Delete("/")
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiMessageDto })
-  async deleteCategory(@Req() request: Request,
-                       @Query("categoryId", ValidateMongoId) categoryId: string): Promise<ApiMessage> {
-    return await this.categoriesService.deleteCategory(request.user.id, categoryId);
+  async deleteCategory(@Query("categoryId", ValidateMongoId) categoryId: string): Promise<ApiMessage> {
+    return await this.categoriesService.deleteCategory(categoryId);
   }
 
   /** Get all categories*/

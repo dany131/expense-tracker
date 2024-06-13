@@ -25,7 +25,8 @@ export class SourceService {
       user: userId,
       name,
       sourceType,
-      description
+      description,
+      isDeleted: false
     });
 
     await source.save();
@@ -33,10 +34,9 @@ export class SourceService {
   }
 
   /** Update source*/
-  async updateSource(sourceId: string, userId: string, updateSourceDto: UpdateSourceDto): Promise<ApiMessageData> {
+  async updateSource(sourceId: string, updateSourceDto: UpdateSourceDto): Promise<ApiMessageData> {
     const { name, description, sourceType } = updateSourceDto;
     const source = await this.getSource(sourceId);
-    if (source.user.toString() !== userId) throw new BadRequestException(ErrorResponseMessages.INVALID_ACTION);
 
     source.name = name || source.name;
     source.sourceType = sourceType || source.sourceType;
@@ -53,9 +53,8 @@ export class SourceService {
   }
 
   /** Delete source*/
-  async deleteSource(userId: string, sourceId: string): Promise<ApiMessage> {
-    const { user } = await this.getSource(sourceId);
-    if (user.toString() !== userId) throw new BadRequestException(ErrorResponseMessages.INVALID_ACTION);
+  async deleteSource(sourceId: string): Promise<ApiMessage> {
+    await this.getSource(sourceId);
 
     await this.Source.updateOne({ _id: sourceId }, { isDeleted: true });
 

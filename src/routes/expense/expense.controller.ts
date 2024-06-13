@@ -40,9 +40,8 @@ export class ExpenseController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiMessageDataDto })
   async updateExpense(@Query("expenseId", ValidateMongoId) expenseId: string,
-                      @Req() request: Request,
                       @Body() reqBody: UpdateExpenseDto): Promise<ApiMessageData> {
-    return await this.expenseService.updateExpense(expenseId, request.user.id, reqBody);
+    return await this.expenseService.updateExpense(expenseId, reqBody);
   }
 
   /** Delete expense*/

@@ -19,8 +19,8 @@ export class CreateIncomeDto {
   @IsMongoId()
   source: string;
 
-  /** Date of income, DD/MM/YYYY
-   * @example 23/12/2023*/
+  /** Date of income, YYYY-MM-DD
+   * @example 2023-12-23*/
   @IsNotEmpty()
   @IsValidDate()
   date: string;

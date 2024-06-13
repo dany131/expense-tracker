@@ -38,11 +38,9 @@ export class ExpenseService {
   }
 
   /** Update expense*/
-  async updateExpense(expenseId: string, userId: string, updateExpenseDto: UpdateExpenseDto): Promise<ApiMessageData> {
+  async updateExpense(expenseId: string, updateExpenseDto: UpdateExpenseDto): Promise<ApiMessageData> {
     const { amount, category, date, description, isRecurring } = updateExpenseDto;
     const expense = await this.getExpense(expenseId);
-
-    if (expense.user.toString() !== userId) throw new BadRequestException(ErrorResponseMessages.INVALID_ACTION);
 
     if (category) {
       const { _id } = await this.categoriesService.getCategory(category);

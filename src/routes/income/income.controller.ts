@@ -41,9 +41,8 @@ export class IncomeController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiMessageDataDto })
   async updateIncome(@Query("incomeId", ValidateMongoId) incomeId: string,
-                     @Req() request: Request,
                      @Body() reqBody: UpdateIncomeDto): Promise<ApiMessageData> {
-    return await this.incomeService.updateIncome(incomeId, request.user.id, reqBody);
+    return await this.incomeService.updateIncome(incomeId, reqBody);
   }
 
   /** Delete income*/

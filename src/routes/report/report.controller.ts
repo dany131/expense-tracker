@@ -19,7 +19,7 @@ export class ReportController {
   @ApiOkResponse({ type: ApiMessageDataDto })
   async getSummary(@Req() request: Request,
                    @Query() getSummaryDto: GetSummaryDto) {
-    await this.reportService.getSummary(request.user.id, getSummaryDto);
+    return await this.reportService.getSummary(request.user.id, getSummaryDto);
   }
 
   @Get("download")

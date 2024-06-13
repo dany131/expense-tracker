@@ -40,18 +40,16 @@ export class SourceController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiMessageDataDto })
   async updateSource(@Query("sourceId", ValidateMongoId) sourceId: string,
-                     @Req() request: Request,
                      @Body() reqBody: UpdateSourceDto): Promise<ApiMessageData> {
-    return await this.sourceService.updateSource(sourceId, request.user.id, reqBody);
+    return await this.sourceService.updateSource(sourceId, reqBody);
   }
 
   /** Delete source*/
   @Delete("/")
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ApiMessageDto })
-  async deleteSource(@Req() request: Request,
-                     @Query("sourceId", ValidateMongoId) sourceId: string): Promise<ApiMessage> {
-    return await this.sourceService.deleteSource(request.user.id, sourceId);
+  async deleteSource(@Query("sourceId", ValidateMongoId) sourceId: string): Promise<ApiMessage> {
+    return await this.sourceService.deleteSource(sourceId);
   }
 
   /** Get all sources*/
