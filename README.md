@@ -43,6 +43,7 @@ This project is built using following framework and libraries.
 * Passport - Authentication
 * Mongoose - ODM
 * Moment - Dates
+* Swagger - API Documentation
 * PDF Make - PDF Files
 
 <!-- GETTING STARTED -->
