@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, Req } from "@nestjs/common";
-import { ApiBearerAuth, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { SuccessResponseMessages } from "@messages/index";
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { ValidateMongoId } from "@pipes/index";
-import { PaginationParamsDto } from "@dto/global";
+import { ApiMessageDataDto, ApiMessageDataPaginationDto, ApiMessageDto, PaginationParamsDto } from "@dto/global";
 import { Request } from "express";
 import { ApiMessage, ApiMessageData, ApiMessageDataPagination, Role } from "@types";
 import { Roles } from "@decorators/roles.decorator";
@@ -20,7 +19,7 @@ export class SourceController {
   /** Get source by id*/
   @Get("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async getSourceById(@Query("sourceId", ValidateMongoId) sourceId: string): Promise<ApiMessageData> {
     return await this.sourceService.getSourceById(sourceId);
   }
@@ -29,7 +28,7 @@ export class SourceController {
   @Roles(Role.User)
   @Post("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.CREATED })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async createSource(@Req() request: Request,
                      @Body() reqBody: CreateSourceDto): Promise<ApiMessageData> {
     return await this.sourceService.createSource(request.user.id, reqBody);
@@ -39,7 +38,7 @@ export class SourceController {
   @Roles(Role.User)
   @Put("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.UPDATED })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async updateSource(@Query("sourceId", ValidateMongoId) sourceId: string,
                      @Req() request: Request,
                      @Body() reqBody: UpdateSourceDto): Promise<ApiMessageData> {
@@ -49,7 +48,7 @@ export class SourceController {
   /** Delete source*/
   @Delete("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDto })
   async deleteSource(@Req() request: Request,
                      @Query("sourceId", ValidateMongoId) sourceId: string): Promise<ApiMessage> {
     return await this.sourceService.deleteSource(request.user.id, sourceId);
@@ -58,7 +57,7 @@ export class SourceController {
   /** Get all sources*/
   @Get("all")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataPaginationDto })
   async getSources(@Req() request: Request,
                    @Query() paginationQuery: PaginationParamsDto,
                    @Query() filtrationQuery: GetAllSourcesDto): Promise<ApiMessageDataPagination> {

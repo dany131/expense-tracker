@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, Req } from "@nestjs/common";
-import { ApiBearerAuth, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { SuccessResponseMessages } from "@messages/index";
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { ValidateMongoId } from "@pipes/index";
-import { PaginationParamsDto } from "@dto/global";
+import { ApiMessageDataDto, ApiMessageDataPaginationDto, ApiMessageDto, PaginationParamsDto } from "@dto/global";
 import { Request } from "express";
 import { ApiMessage, ApiMessageData, ApiMessageDataPagination, Role } from "@types";
 import { Roles } from "@decorators/roles.decorator";
@@ -20,7 +19,7 @@ export class ExpenseController {
   /** Get expense by id*/
   @Get("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async getExpense(@Query("expenseId", ValidateMongoId) expenseId: string): Promise<ApiMessageData> {
     return await this.expenseService.getExpenseById(expenseId);
   }
@@ -29,7 +28,7 @@ export class ExpenseController {
   @Roles(Role.User)
   @Post("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.CREATED })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async createExpense(@Req() request: Request,
                       @Body() reqBody: CreateExpenseDto): Promise<ApiMessageData> {
     return await this.expenseService.createExpense(request.user.id, reqBody);
@@ -39,7 +38,7 @@ export class ExpenseController {
   @Roles(Role.User)
   @Put("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.UPDATED })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async updateExpense(@Query("expenseId", ValidateMongoId) expenseId: string,
                       @Req() request: Request,
                       @Body() reqBody: UpdateExpenseDto): Promise<ApiMessageData> {
@@ -49,7 +48,7 @@ export class ExpenseController {
   /** Delete expense*/
   @Delete("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDto })
   async deleteExpense(@Query("expenseId", ValidateMongoId) expenseId: string): Promise<ApiMessage> {
     return await this.expenseService.deleteExpense(expenseId);
   }
@@ -57,7 +56,7 @@ export class ExpenseController {
   /** Get all expenses*/
   @Get("all")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataPaginationDto })
   async getExpenses(@Req() request: Request,
                     @Query() paginationQuery: PaginationParamsDto): Promise<ApiMessageDataPagination> {
     return await this.expenseService.getExpenses(request.user.id, paginationQuery);

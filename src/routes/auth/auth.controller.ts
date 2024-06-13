@@ -11,13 +11,14 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { Public } from "@decorators/index";
-import { ApiBearerAuth, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { ErrorResponseMessages, SuccessResponseMessages } from "@messages/index";
+import { ApiBearerAuth, ApiOkResponse, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ErrorResponseMessages } from "@messages/index";
 import { EmailVerificationDto, ForgotPassChangeDto, ForgotPasswordDto, LoginDto, SignUpDto } from "@dto/auth";
 import { AuthService } from "@routes/auth/auth.service";
 import { ValidateMongoId } from "@pipes/index";
 import { RtGuard } from "@guards/index";
 import { Request } from "express";
+import { ApiMessageDataDto, ApiMessageDto } from "@dto/global";
 
 
 @ApiTags("auth")
@@ -26,11 +27,11 @@ export class AuthController {
   constructor(private authService: AuthService) {
   }
 
-  /** Sign Trades Person or Home-Owner */
+  /** Sign up user*/
   @Public()
   @Post("signup")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   @ApiResponse({
     status: 400,
     description: `${ErrorResponseMessages.EMAIL_EXISTS}, ${ErrorResponseMessages.INVALID_AUTHENTICATION}`
@@ -43,7 +44,7 @@ export class AuthController {
   @Public()
   @Post("login")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   @ApiResponse({
     status: 400,
     description: `${ErrorResponseMessages.INVALID_EMAIL}, ${ErrorResponseMessages.INVALID_PASSWORD}, ${ErrorResponseMessages.INVALID_AUTHENTICATION}`
@@ -56,7 +57,7 @@ export class AuthController {
   @Public()
   @Post("email-verification")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.ACCOUNT_VERIFICATION })
+  @ApiOkResponse({ type: ApiMessageDto })
   @ApiResponse({
     status: 400,
     description: `${ErrorResponseMessages.USER_NOT_EXISTS}, ${ErrorResponseMessages.ACCOUNT_VERIFIED}, ${ErrorResponseMessages.INVALID_CODE}`
@@ -70,7 +71,7 @@ export class AuthController {
   @Public()
   @Post("forgot-password")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.VERIFICATION_CODE_SENT })
+  @ApiOkResponse({ type: ApiMessageDto })
   @ApiResponse({ status: 400, description: ErrorResponseMessages.INVALID_EMAIL })
   async forgotPassword(@Body() reqBody: ForgotPasswordDto) {
     return await this.authService.forgotPassword(reqBody);
@@ -80,7 +81,7 @@ export class AuthController {
   @Public()
   @Post("forgot-password/change-password")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDto })
   @ApiResponse({
     status: 400,
     description: `${ErrorResponseMessages.INVALID_EMAIL}, ${ErrorResponseMessages.INVALID_CODE}`
@@ -95,7 +96,7 @@ export class AuthController {
   @ApiBearerAuth("JWT-auth")
   @Get("tokens")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   @ApiResponse({ status: 403, description: ErrorResponseMessages.ACCESS_DENIED })
   @ApiResponse({ status: 401, description: ErrorResponseMessages.INVALID_REFRESH_TOKEN })
   async refreshToken(@Req() request: Request,
@@ -108,7 +109,7 @@ export class AuthController {
   @Post("logout")
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth("JWT-auth")
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDto })
   @ApiResponse({ status: 400, description: ErrorResponseMessages.USER_NOT_EXISTS })
   async logout(@Req() request: Request) {
     return await this.authService.logout(request);
@@ -118,7 +119,7 @@ export class AuthController {
   @Public()
   @Get("resend-verification-code")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.VERIFICATION_CODE_SENT })
+  @ApiOkResponse({ type: ApiMessageDto })
   @ApiResponse({
     status: 400,
     description: `${ErrorResponseMessages.USER_NOT_EXISTS}, ${ErrorResponseMessages.ACCOUNT_VERIFIED}`

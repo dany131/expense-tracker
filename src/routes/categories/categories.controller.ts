@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, Req } from "@nestjs/common";
-import { ApiBearerAuth, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { SuccessResponseMessages } from "@messages/index";
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { ValidateMongoId } from "@pipes/index";
-import { PaginationParamsDto } from "@dto/global";
+import { ApiMessageDataDto, ApiMessageDataPaginationDto, ApiMessageDto, PaginationParamsDto } from "@dto/global";
 import { Request } from "express";
 import { ApiMessage, ApiMessageData, ApiMessageDataPagination, Role } from "@types";
 import { Roles } from "@decorators/roles.decorator";
@@ -21,7 +20,7 @@ export class CategoriesController {
   /** Get category by id*/
   @Get("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async getCategoryById(@Query("categoryId", ValidateMongoId) categoryId: string): Promise<ApiMessageData> {
     return await this.categoriesService.getCategoryById(categoryId);
   }
@@ -30,7 +29,7 @@ export class CategoriesController {
   @Roles(Role.User)
   @Post("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.CREATED })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async createCategory(@Req() request: Request,
                        @Body() reqBody: CreateCategoryDto): Promise<ApiMessageData> {
     return await this.categoriesService.createCategory(request.user.id, reqBody);
@@ -40,7 +39,7 @@ export class CategoriesController {
   @Roles(Role.User)
   @Put("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.UPDATED })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async updateCategory(@Query("categoryId", ValidateMongoId) categoryId: string,
                        @Req() request: Request,
                        @Body() reqBody: UpdateCategoryDto): Promise<ApiMessageData> {
@@ -50,7 +49,7 @@ export class CategoriesController {
   /** Delete category*/
   @Delete("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDto })
   async deleteCategory(@Req() request: Request,
                        @Query("categoryId", ValidateMongoId) categoryId: string): Promise<ApiMessage> {
     return await this.categoriesService.deleteCategory(request.user.id, categoryId);
@@ -59,7 +58,7 @@ export class CategoriesController {
   /** Get all categories*/
   @Get("all")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataPaginationDto })
   async getCategories(@Req() request: Request,
                       @Query() paginationQuery: PaginationParamsDto,
                       @Query() filtrationQuery: GetCategoriesDto): Promise<ApiMessageDataPagination> {

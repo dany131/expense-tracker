@@ -1,8 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Put, Query, Req } from "@nestjs/common";
-import { ApiBearerAuth, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { SuccessResponseMessages } from "@messages/index";
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { ValidateMongoId } from "@pipes/index";
-import { PaginationParamsDto } from "@dto/global";
+import { ApiMessageDataDto, ApiMessageDataPaginationDto, ApiMessageDto, PaginationParamsDto } from "@dto/global";
 import { UserService } from "@routes/user/user.service";
 import { ChangePasswordDto } from "@dto/user";
 import { Request } from "express";
@@ -20,7 +19,7 @@ export class UserController {
   /** Get user*/
   @Get("/")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataDto })
   async getUser(@Query("userId", ValidateMongoId) userId: string): Promise<ApiMessageData> {
     return await this.userService.getUserById(userId);
   }
@@ -29,7 +28,7 @@ export class UserController {
   @Get("all")
   @Roles(Role.SuperUser)
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.SUCCESS_GENERAL })
+  @ApiOkResponse({ type: ApiMessageDataPaginationDto })
   async getUsers(@Query() paginationQuery: PaginationParamsDto): Promise<ApiMessageDataPagination> {
     return await this.userService.getUsers(paginationQuery);
   }
@@ -37,7 +36,7 @@ export class UserController {
   /** Change user password*/
   @Put("password")
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: 200, description: SuccessResponseMessages.UPDATED })
+  @ApiOkResponse({ type: ApiMessageDto })
   async changePassword(@Req() request: Request,
                        @Body() reqBody: ChangePasswordDto): Promise<ApiMessage> {
     return await this.userService.changePassword(request.user.id, reqBody);
