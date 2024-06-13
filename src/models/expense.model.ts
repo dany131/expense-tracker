@@ -15,7 +15,7 @@ const ExpenseSchema = new mongoose.Schema({
     required: true,
     ref: "Categories"
   },
-  date: String,
+  date: Date,
   description: String,
   isRecurring: Boolean,
   isDeleted: Boolean
@@ -27,7 +27,7 @@ export interface ExpenseModel extends mongoose.Document, TimeStamps {
   user: mongoose.Schema.Types.ObjectId;
   amount: number;
   category: mongoose.Schema.Types.ObjectId;
-  date: string;
+  date: Date;
   description: string;
   isRecurring: boolean;
   isDeleted: boolean;

@@ -2,7 +2,7 @@ import { ExpenseModel } from "@models/index";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { PaginationHelper } from "@helpers/index";
+import { DateHelper, PaginationHelper } from "@helpers/index";
 import { PaginationParamsDto } from "@dto/global";
 import { ErrorResponseMessages, SuccessResponseMessages } from "@messages/index";
 import { ApiMessage, ApiMessageData, ApiMessageDataPagination, FieldSelector } from "@types";
@@ -15,6 +15,7 @@ export class ExpenseService {
 
   constructor(@InjectModel("Expense") private readonly Expense: Model<ExpenseModel>,
               private paginationHelper: PaginationHelper,
+              private dateHelper: DateHelper,
               private readonly categoriesService: CategoriesService) {
   }
 
@@ -27,7 +28,7 @@ export class ExpenseService {
       user: userId,
       amount,
       category,
-      date,
+      date: this.dateHelper.getDate(date),
       description,
       isRecurring
     });
@@ -48,8 +49,9 @@ export class ExpenseService {
       expense.category = _id;
     }
 
+    if (date) expense.date = this.dateHelper.getDate(date);
+
     expense.amount = amount || expense.amount;
-    expense.date = date || expense.date;
     expense.description = description || expense.description;
     expense.isRecurring = isRecurring || expense.isRecurring;
 

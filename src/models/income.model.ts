@@ -15,7 +15,7 @@ const IncomeSchema = new mongoose.Schema({
     required: true,
     ref: "Source"
   },
-  date: String,
+  date: Date,
   description: String,
   isRecurring: Boolean,
   isDeleted: Boolean
@@ -27,7 +27,7 @@ export interface IncomeModel extends mongoose.Document, TimeStamps {
   user: mongoose.Schema.Types.ObjectId;
   amount: number;
   source: mongoose.Schema.Types.ObjectId;
-  date: string;
+  date: Date;
   description: string;
   isRecurring: boolean;
   isDeleted: boolean;

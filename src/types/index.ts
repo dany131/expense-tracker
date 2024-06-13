@@ -83,3 +83,24 @@ export enum TimeFrame {
   Week = "Week",
   Today = "Today"
 }
+
+export interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+export interface IncomePdf {
+  date: string;
+  amount: number;
+  sourceName: string;
+  sourceType: string;
+
+}
+
+export interface ExpensesPdf {
+  date: string;
+  amount: number;
+  categoryName: string;
+  categoryType: string;
+
+}

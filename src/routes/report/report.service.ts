@@ -1,41 +1,134 @@
-import { IncomeModel } from "@models/index";
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { ExpenseModel, IncomeModel } from "@models/index";
+import { Injectable } from "@nestjs/common";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { PaginationHelper } from "@helpers/index";
-import { PaginationParamsDto } from "@dto/global";
-import { ErrorResponseMessages, SuccessResponseMessages } from "@messages/index";
-import { ApiMessage, ApiMessageData, ApiMessageDataPagination, FieldSelector } from "@types";
-import { CreateIncomeDto, UpdateIncomeDto } from "@dto/income";
-import { SourceService } from "@routes/source/source.service";
+import { DateHelper } from "@helpers/index";
+import { SuccessResponseMessages } from "@messages/index";
+import {
+  ApiMessageData,
+  DateRange,
+  ExpensesPdf,
+  IncomePdf,
+  TimeFrame
+} from "@types";
 import { GetSummaryDto } from "@dto/report";
+import { PdfHelper } from "@helpers/pdf.helper";
+import { Response } from "express";
 
 
 @Injectable()
 export class ReportService {
   constructor(@InjectModel("Income") private readonly Income: Model<IncomeModel>,
-              private paginationHelper: PaginationHelper,
-              private readonly sourceService: SourceService) {
+              @InjectModel("Expense") private readonly Expense: Model<ExpenseModel>,
+              private pdfHelper: PdfHelper,
+              private dateHelper: DateHelper) {
   }
 
-  // Get summary
-  async getSummary(userId: string, pagination: PaginationParamsDto, getSummaryDto: GetSummaryDto): Promise<ApiMessageDataPagination> {
-    const { page, limit } = pagination;
-    const matchingQuery = { user: userId };
+  /** Get summary*/
+  async getSummary(userId: string, getSummaryDto: GetSummaryDto): Promise<ApiMessageData> {
+    const { timeFrame } = getSummaryDto;
 
-    const { data, lastPage, total } = await this.paginationHelper.paginate({
-      model: this.Income,
-      page,
-      limit,
-      matchingQuery,
-      populate: [
-        { path: "user", select: FieldSelector.User },
-        { path: "source" }]
+    let matchingQuery: { user: string, date?: object } = { user: userId };
+
+    const range = this.getDateRange(timeFrame);
+
+    if (range) matchingQuery.date = { $gte: range.start, $lte: range.end };
+
+    const incomes = await this.Income.find(matchingQuery);
+    const incomeTotal = incomes.reduce((sum, item) => sum + item.amount, 0);
+
+    const expenses = await this.Expense.find(matchingQuery);
+    const expenseTotal = expenses.reduce((sum, item) => sum + item.amount, 0);
+
+    const balance = incomeTotal - expenseTotal;
+
+    return {
+      message: SuccessResponseMessages.SUCCESS_GENERAL,
+      data: {
+        incomeCount: incomes.length,
+        incomeTotal,
+        expenseCount: expenses.length,
+        expenseTotal,
+        balance
+      }
+    };
+  }
+
+  /** Download summary*/
+  async downloadSummary(userId: string, getSummaryDto: GetSummaryDto, res: Response) {
+    const { timeFrame } = getSummaryDto;
+    let matchingQuery: { user: string, date?: object } = { user: userId };
+
+    const range = this.getDateRange(timeFrame);
+
+    if (range) matchingQuery.date = { $gte: range.start, $lte: range.end };
+
+    const incomes = await this.Income.find(matchingQuery).populate({ path: "source" });
+
+    const incomeTotal = incomes.reduce((sum, item) => sum + item.amount, 0);
+
+    const expenses = await this.Expense.find(matchingQuery).populate({ path: "category" });
+
+    const expenseTotal = expenses.reduce((sum, item) => sum + item.amount, 0);
+
+    const balance = incomeTotal - expenseTotal;
+
+    const pdfIncomes: IncomePdf[] = incomes.map((income: any) => {
+      return {
+        date: income.date.toString(),
+        amount: income.amount,
+        sourceName: income.source.name,
+        sourceType: income.source.sourceType
+      };
     });
 
-    return { message: SuccessResponseMessages.SUCCESS_GENERAL, data, page, lastPage, total };
+    const pdfExpenses: ExpensesPdf[] = expenses.map((expense: any) => {
+      return {
+        date: expense.date.toString(),
+        amount: expense.amount,
+        categoryName: expense.category.name,
+        categoryType: expense.category.categoryType
+      };
+    });
+
+    const pdfDoc = await this.pdfHelper.generateSummaryPdf(
+      incomes.length,
+      incomeTotal,
+      pdfIncomes,
+      expenses.length,
+      expenseTotal,
+      pdfExpenses,
+      balance);
+
+    pdfDoc.getBuffer((buffer) => {
+      res.setHeader("Content-disposition", "attachment; filename=data.pdf");
+      res.setHeader("Content-type", "application/pdf");
+      res.send(Buffer.from(buffer));
+    });
   }
 
-  // Download summary
+  /** Internal*/
+  private getDateRange(timeFrame: TimeFrame): DateRange | null {
+    let dateRange: DateRange;
+
+    switch (timeFrame) {
+      case TimeFrame.Today:
+        dateRange = this.dateHelper.getToday();
+        break;
+      case TimeFrame.Week:
+        dateRange = this.dateHelper.getThisWeek();
+        break;
+      case TimeFrame.Month:
+        dateRange = this.dateHelper.getThisMonth();
+        break;
+      case TimeFrame.Year:
+        dateRange = this.dateHelper.getThisYear();
+        break;
+      default:
+        dateRange = null;
+    }
+
+    return dateRange;
+  }
 }
 
