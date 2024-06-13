@@ -42,7 +42,7 @@ This project is built using following framework and libraries.
 * NestJS - Framework
 * Passport - Authentication
 * Mongoose - ODM
-* Moment - Dates
+* Winston - Logging
 * Swagger - API Documentation
 * PDF Make - PDF Files
 
